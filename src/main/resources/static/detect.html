@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Deteksi Penyakit - CabaiDetect</title>
+  <meta name="description" content="Input data tanaman dan lingkungan untuk deteksi penyakit cabai">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Top Bar -->
+    <div class="topbar">
+      <a href="/home.html" class="topbar-back">←</a>
+      <span class="topbar-title">Deteksi Penyakit</span>
+      <div class="topbar-action"></div>
+    </div>
+
+    <!-- Form -->
+    <form class="detect-page" onsubmit="handleDetect(event)">
+      
+      <!-- Foto Tanaman -->
+      <div class="section-title fade-in">📷 Foto Buah Cabai</div>
+      <div class="photo-upload fade-in fade-in-delay-1" id="photo-upload">
+        <div class="icon">🌶️</div>
+        <p>Ketuk untuk mengambil foto buah cabai</p>
+        <small>Ambil foto buah cabai (gejala antraknosa/patek, busuk buah, lalat buah, atau buah sehat)</small>
+      </div>
+      <input type="file" id="foto-input" accept="image/*" capture="environment" style="display:none">
+      <div class="photo-preview" id="photo-preview" style="display:none"></div>
+
+      <!-- Pilihan Jenis Cabai & Fokus Objek Buah -->
+      <div class="form-row fade-in fade-in-delay-1">
+        <div class="form-group">
+          <label>🌶️ Jenis Cabai</label>
+          <select class="form-control" id="jenisCabai" required>
+            <option value="Cabai Rawit">🌶️ Cabai Rawit (C. frutescens)</option>
+            <option value="Cabai Merah Keriting">🌶️ Cabai Merah Keriting</option>
+            <option value="Cabai Merah Besar">🌶️ Cabai Merah Besar</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>🎯 Objek Analisis</label>
+          <div class="form-control" style="display:flex; align-items:center; background:rgba(13,124,95,0.08); font-weight:600; color:var(--primary); cursor:default;">
+            🌶️ Buah Cabai
+          </div>
+          <input type="hidden" id="bagianTanaman" value="Buah">
+        </div>
+      </div>
+
+      <!-- Data Lingkungan -->
+      <div class="section-title fade-in fade-in-delay-2" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <span>🌡️ Data Lingkungan</span>
+        <div style="display:flex; gap:6px;">
+          <button type="button" class="btn btn-primary btn-sm" onclick="fetchRealtimeWeather()" style="padding:6px 10px; font-size:12px; width:auto;">🌤️ Cuaca Realtime</button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="fillPrototypeData()" style="padding:6px 10px; font-size:12px; width:auto;">🧪 Prototype</button>
+        </div>
+      </div>
+      
+      <!-- Weather Status Badge -->
+      <div id="weather-badge" style="display:none; margin-bottom:14px; padding:10px 14px; background:rgba(13,124,95,0.15); border:1px solid var(--primary); border-radius:var(--radius-xs); font-size:12px; color:var(--text-primary); line-height:1.5;"></div>
+      <div class="env-section fade-in fade-in-delay-2">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Suhu Udara (°C)</label>
+            <input type="number" step="0.1" class="form-control" id="suhuUdara" placeholder="28.5" required>
+          </div>
+          <div class="form-group">
+            <label>Kelembaban Udara (%)</label>
+            <input type="number" step="0.1" class="form-control" id="kelembabanUdara" placeholder="78" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>pH Tanah</label>
+            <input type="number" step="0.1" class="form-control" id="phTanah" placeholder="6.2" required>
+          </div>
+          <div class="form-group">
+            <label>Kelembaban Tanah (%)</label>
+            <input type="number" step="0.1" class="form-control" id="kelembabanTanah" placeholder="65" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Curah Hujan (mm/hari)</label>
+            <input type="number" step="0.1" class="form-control" id="curahHujan" placeholder="12" required>
+          </div>
+          <div class="form-group">
+            <label>Intensitas Cahaya (lux)</label>
+            <input type="number" class="form-control" id="intensitasCahaya" placeholder="35000" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Umur Tanaman (hari)</label>
+            <input type="number" class="form-control" id="umurTanaman" placeholder="45" required>
+          </div>
+          <div class="form-group">
+            <label>Ada Hama?</label>
+            <select class="form-control" id="adaHama">
+              <option value="false">Tidak</option>
+              <option value="true">Ya, Ada</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn btn-primary fade-in fade-in-delay-3">
+        🔬 Analisis Penyakit
+      </button>
+    </form>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <a href="/home.html" class="nav-item" data-page="home">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Beranda</span>
+      </a>
+      <a href="/detect.html" class="nav-item active" data-page="detect">
+        <span class="nav-icon">🔍</span>
+        <span class="nav-label">Deteksi</span>
+      </a>
+      <a href="/history.html" class="nav-item" data-page="history">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Riwayat</span>
+      </a>
+      <a href="/profile.html" class="nav-item" data-page="profile">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profil</span>
+      </a>
+    </nav>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>initDetectPage();</script>
+</body>
+</html>

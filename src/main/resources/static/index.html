@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CabaiDetect - Deteksi Penyakit Tanaman Cabai</title>
+  <meta name="description" content="Aplikasi deteksi penyakit tanaman cabai berbasis AI">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="app">
+    <div class="splash">
+      <div class="splash-logo">🌶️</div>
+      <h1>CabaiDetect</h1>
+      <p>Tanaman Sehat, Hasil Maksimal</p>
+      <div class="splash-loader"></div>
+    </div>
+  </div>
+  <script>
+    setTimeout(() => {
+      const user = localStorage.getItem('cabaidetect_user');
+      window.location.href = user ? '/home.html' : '/login.html';
+    }, 2500);
+  </script>
+</body>
+</html>

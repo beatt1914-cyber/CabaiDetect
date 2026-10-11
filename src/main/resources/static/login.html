@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — CabaiDetect</title>
+  <meta name="description" content="Login ke CabaiDetect, sistem deteksi penyakit cabe berbasis AI"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #ef4444; --red-dark: #dc2626; --red-darker: #991b1b;
+      --bg: #0a0f1e; --surface: #111827; --surface2: #1e2a3a;
+      --border: rgba(255,255,255,0.08); --text: #f1f5f9;
+      --muted: #64748b; --success: #22c55e; --warn: #f59e0b;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 20%, rgba(220,38,38,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(239,68,68,0.08) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .particles { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+    .particle {
+      position: absolute; border-radius: 50%;
+      background: rgba(239,68,68,0.3);
+      animation: float linear infinite;
+    }
+    @keyframes float {
+      0% { transform: translateY(100vh) scale(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 0.5; }
+      100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+    }
+
+    .container { width: 100%; max-width: 440px; padding: 24px; position: relative; z-index: 10; }
+
+    .logo { text-align: center; margin-bottom: 32px; }
+    .logo-icon { font-size: 48px; display: block; animation: bounce 2s ease-in-out infinite; }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .logo-title {
+      font-size: 28px; font-weight: 800;
+      background: linear-gradient(135deg, #ef4444, #f97316);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin: 8px 0 4px;
+    }
+    .logo-sub { color: var(--muted); font-size: 13px; }
+
+    .card {
+      background: rgba(17,24,39,0.9);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 32px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    .card-title { color: var(--text); font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    .card-sub { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
+
+    .tabs { display: flex; background: var(--surface2); border-radius: 10px; padding: 4px; margin-bottom: 28px; gap: 4px; }
+    .tab-btn { flex: 1; padding: 9px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: transparent; color: var(--muted); }
+    .tab-btn.active { background: var(--red-dark); color: #fff; box-shadow: 0 2px 8px rgba(220,38,38,0.4); }
+
+    .form-group { margin-bottom: 18px; }
+    .form-label { display: block; color: var(--text); font-size: 13px; font-weight: 500; margin-bottom: 7px; }
+    .form-label span { color: var(--red); }
+
+    .input-wrap { position: relative; }
+    .form-input {
+      width: 100%; padding: 12px 44px 12px 44px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+    }
+    .form-input:focus { border-color: var(--red-dark); box-shadow: 0 0 0 3px rgba(220,38,38,0.15); }
+    .form-input::placeholder { color: var(--muted); }
+
+    .input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 16px; pointer-events: none; }
+    .input-eye { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; transition: color 0.2s; }
+    .input-eye:hover { color: var(--text); }
+
+    .field-error { color: #f87171; font-size: 12px; margin-top: 5px; display: none; }
+    .field-error.show { display: block; }
+
+    .strength-bar { display: flex; gap: 4px; margin-top: 8px; }
+    .strength-seg { height: 3px; flex: 1; border-radius: 2px; background: var(--surface2); transition: background 0.3s; }
+    .strength-seg.active-weak { background: #ef4444; }
+    .strength-seg.active-medium { background: var(--warn); }
+    .strength-seg.active-strong { background: var(--success); }
+
+    .otp-inputs { display: flex; gap: 10px; justify-content: center; margin: 20px 0; }
+    .otp-input {
+      width: 52px; height: 58px; text-align: center;
+      background: var(--surface2); border: 2px solid var(--border);
+      border-radius: 12px; color: var(--text); font-size: 22px;
+      font-weight: 700; font-family: monospace;
+      transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+    }
+    .otp-input:focus { border-color: var(--red-dark); box-shadow: 0 0 0 3px rgba(220,38,38,0.2); }
+    .otp-input.filled { border-color: var(--red); }
+
+    .otp-timer { text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+    .otp-timer span { color: var(--warn); font-weight: 600; }
+    .resend-btn { background: none; border: none; color: var(--red); font-size: 13px; cursor: pointer; font-weight: 500; text-decoration: underline; }
+    .resend-btn:disabled { color: var(--muted); cursor: default; text-decoration: none; }
+
+    .btn { width: 100%; padding: 13px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: 'Inter', sans-serif; }
+    .btn-primary { background: linear-gradient(135deg, var(--red-dark), var(--red-darker)); color: #fff; box-shadow: 0 4px 15px rgba(220,38,38,0.35); }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(220,38,38,0.5); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); margin-top: 10px; }
+    .btn-ghost:hover { border-color: var(--red); color: var(--text); }
+
+    .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .alert { padding: 12px 16px; border-radius: 10px; font-size: 13px; margin-bottom: 18px; display: none; align-items: center; gap: 10px; }
+    .alert.show { display: flex; }
+    .alert-error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+    .alert-success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: #86efac; }
+
+    .link { color: var(--red); text-decoration: none; font-weight: 500; }
+    .link:hover { text-decoration: underline; }
+    .center-text { text-align: center; color: var(--muted); font-size: 13px; margin-top: 20px; }
+
+    .forgot-link { display: block; text-align: right; color: var(--muted); font-size: 12px; text-decoration: none; margin-top: -12px; margin-bottom: 18px; }
+    .forgot-link:hover { color: var(--red); }
+
+    .checkbox-group { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .checkbox-group input[type="checkbox"] { accent-color: var(--red); width: 16px; height: 16px; }
+    .checkbox-group label { color: var(--muted); font-size: 13px; cursor: pointer; }
+
+    .steps { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; justify-content: center; }
+    .step { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; border: 2px solid var(--border); color: var(--muted); transition: all 0.3s; }
+    .step.active { background: var(--red-dark); border-color: var(--red-dark); color: #fff; }
+    .step.done { background: var(--success); border-color: var(--success); color: #fff; }
+    .step-line { flex: 1; height: 2px; background: var(--border); border-radius: 1px; }
+    .step-line.done { background: var(--success); }
+
+    .info-box { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.2); border-radius: 10px; padding: 12px 14px; margin-bottom: 20px; font-size: 13px; color: #fca5a5; display: flex; gap: 10px; }
+
+    @media (max-width: 480px) {
+      .container { padding: 16px; }
+      .card { padding: 28px 20px; }
+      .otp-input { width: 44px; height: 50px; font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+<div class="particles" id="particles"></div>
+
+<div class="container">
+  <div class="logo">
+    <span class="logo-icon">🌶️</span>
+    <div class="logo-title">CabaiDetect</div>
+    <div class="logo-sub">Deteksi Penyakit Cabe dengan AI</div>
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Masuk</button>
+      <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Daftar</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="form-login">
+      <h2 class="card-title">Selamat Datang Kembali</h2>
+      <p class="card-sub">Masuk ke akun CabaiDetect kamu</p>
+      <div id="alert-login" class="alert"></div>
+      <div class="form-group">
+        <label class="form-label">Email <span>*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">📧</span>
+          <input type="email" id="login-email" class="form-input" placeholder="nama@gmail.com" autocomplete="email"/>
+        </div>
+        <div class="field-error" id="err-login-email"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password <span>*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input type="password" id="login-password" class="form-input" placeholder="Password kamu" autocomplete="current-password"/>
+          <button class="input-eye" onclick="togglePass('login-password',this)" type="button">👁️</button>
+        </div>
+        <div class="field-error" id="err-login-pass"></div>
+      </div>
+      <a href="#" class="forgot-link" onclick="showForgot();return false;">Lupa password?</a>
+      <div class="checkbox-group">
+        <input type="checkbox" id="remember-me"/>
+        <label for="remember-me">Ingat saya selama 30 hari</label>
+      </div>
+      <button class="btn btn-primary" id="btn-login" onclick="doLogin()"><span>Masuk</span></button>
+      <div class="center-text">Belum punya akun? <a href="#" class="link" onclick="switchTab('register');return false;">Daftar sekarang</a></div>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="form-register" style="display:none;">
+      <div class="steps" id="reg-steps">
+        <div class="step active" id="step1">1</div>
+        <div class="step-line" id="line1"></div>
+        <div class="step" id="step2">2</div>
+        <div class="step-line" id="line2"></div>
+        <div class="step" id="step3">✓</div>
+      </div>
+
+      <!-- Step 1 -->
+      <div id="reg-step1">
+        <h2 class="card-title">Buat Akun Baru</h2>
+        <p class="card-sub">Isi data dirimu untuk mendaftar</p>
+        <div id="alert-register" class="alert"></div>
+        <div class="form-group">
+          <label class="form-label">Nama Lengkap <span>*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">👤</span>
+            <input type="text" id="reg-nama" class="form-input" placeholder="Nama lengkap kamu" autocomplete="name"/>
+          </div>
+          <div class="field-error" id="err-nama"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Gmail <span>*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">📧</span>
+            <input type="email" id="reg-email" class="form-input" placeholder="nama@gmail.com" autocomplete="email"/>
+          </div>
+          <div class="field-error" id="err-email"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password <span>*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="reg-password" class="form-input" placeholder="Min. 8 karakter" oninput="checkStrength(this.value)" autocomplete="new-password"/>
+            <button class="input-eye" onclick="togglePass('reg-password',this)" type="button">👁️</button>
+          </div>
+          <div class="strength-bar">
+            <div class="strength-seg" id="str1"></div>
+            <div class="strength-seg" id="str2"></div>
+            <div class="strength-seg" id="str3"></div>
+            <div class="strength-seg" id="str4"></div>
+          </div>
+          <div class="field-error" id="err-password"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Konfirmasi Password <span>*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">🔐</span>
+            <input type="password" id="reg-confirm" class="form-input" placeholder="Ulangi password" autocomplete="new-password"/>
+            <button class="input-eye" onclick="togglePass('reg-confirm',this)" type="button">👁️</button>
+          </div>
+          <div class="field-error" id="err-confirm"></div>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="agree-terms"/>
+          <label for="agree-terms">Saya setuju dengan <a href="#" class="link">syarat &amp; ketentuan</a></label>
+        </div>
+        <button class="btn btn-primary" id="btn-register" onclick="doRegister()"><span>Daftar &amp; Kirim OTP</span></button>
+        <div class="center-text">Sudah punya akun? <a href="#" class="link" onclick="switchTab('login');return false;">Masuk</a></div>
+      </div>
+
+      <!-- Step 2: OTP -->
+      <div id="reg-step2" style="display:none;">
+        <h2 class="card-title">Verifikasi Email</h2>
+        <p class="card-sub">Kode OTP dikirim ke email kamu</p>
+        <div class="info-box">
+          <span>📧</span>
+          <div>Kode OTP 6 digit dikirim ke <strong id="otp-email-display"></strong>. Cek inbox atau folder spam.</div>
+        </div>
+        <div id="alert-otp" class="alert"></div>
+        <div class="otp-inputs">
+          <input type="text" class="otp-input" maxlength="1" id="otp0" oninput="otpInput(this,0,'otp')" onkeydown="otpBack(event,this,0,'otp')" inputmode="numeric"/>
+          <input type="text" class="otp-input" maxlength="1" id="otp1" oninput="otpInput(this,1,'otp')" onkeydown="otpBack(event,this,1,'otp')" inputmode="numeric"/>
+          <input type="text" class="otp-input" maxlength="1" id="otp2" oninput="otpInput(this,2,'otp')" onkeydown="otpBack(event,this,2,'otp')" inputmode="numeric"/>
+          <input type="text" class="otp-input" maxlength="1" id="otp3" oninput="otpInput(this,3,'otp')" onkeydown="otpBack(event,this,3,'otp')" inputmode="numeric"/>
+          <input type="text" class="otp-input" maxlength="1" id="otp4" oninput="otpInput(this,4,'otp')" onkeydown="otpBack(event,this,4,'otp')" inputmode="numeric"/>
+          <input type="text" class="otp-input" maxlength="1" id="otp5" oninput="otpInput(this,5,'otp')" onkeydown="otpBack(event,this,5,'otp')" inputmode="numeric"/>
+        </div>
+        <div class="otp-timer">Kode kedaluwarsa dalam <span id="timer">10:00</span></div>
+        <div style="text-align:center;margin-bottom:20px;">
+          <button class="resend-btn" id="resend-btn" onclick="doResend()" disabled>Kirim ulang OTP</button>
+        </div>
+        <button class="btn btn-primary" id="btn-verify" onclick="doVerifyOtp()"><span>Verifikasi OTP</span></button>
+        <button class="btn btn-ghost" onclick="goBackReg()">← Ubah Email</button>
+      </div>
+
+      <!-- Step 3: Sukses -->
+      <div id="reg-step3" style="display:none;text-align:center;padding:20px 0;">
+        <div style="font-size:60px;margin-bottom:16px;">🎉</div>
+        <h2 style="color:#f1f5f9;font-size:22px;font-weight:700;margin-bottom:8px;">Akun Berhasil Dibuat!</h2>
+        <p style="color:#64748b;font-size:14px;margin-bottom:28px;">Selamat datang di CabaiDetect. Mengalihkan ke dashboard...</p>
+        <div style="width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:#ef4444;border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto;"></div>
+      </div>
+    </div>
+
+    <!-- FORGOT PASSWORD -->
+    <div id="form-forgot" style="display:none;">
+      <h2 class="card-title">Lupa Password?</h2>
+      <p class="card-sub">Masukkan email untuk mendapatkan kode reset</p>
+      <div id="alert-forgot" class="alert"></div>
+
+      <div id="forgot-step1">
+        <div class="form-group">
+          <label class="form-label">Email <span>*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">📧</span>
+            <input type="email" id="forgot-email" class="form-input" placeholder="nama@gmail.com"/>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="btn-forgot" onclick="doForgot()"><span>Kirim Kode OTP</span></button>
+        <button class="btn btn-ghost" onclick="switchTab('login')">← Kembali ke Login</button>
+      </div>
+
+      <div id="forgot-step2" style="display:none;">
+        <p style="color:#94a3b8;font-size:13px;margin-bottom:16px;">Masukkan OTP yang dikirim ke email kamu:</p>
+        <div class="otp-inputs">
+          <input type="text" class="otp-input" maxlength="1" id="fotp0" oninput="otpInput(this,0,'fotp')" onkeydown="otpBack(event,this,0,'fotp')" inputmode="numeric"/>
+          <input type="text" class="otp-input" maxlength="1" id="fotp1" oninput="otpInput(this,1,'fotp')" onkeydown="otpBack(event,this,1,'fotp')" inputmode="numeric"/>
+          <input type="text" class="otp-input" maxlength="1" id="fotp2" oninput="otpInput(this,2,'fotp')" onkeydown="otpBack(event,this,2,'fotp')" inputmode="numeric"/>
+          <input type="text" class="otp-input" maxlength="1" id="fotp3" oninput="otpInput(this,3,'fotp')" onkeydown="otpBack(event,this,3,'fotp')" inputmode="numeric"/>
+          <input type="text" class="otp-input" maxlength="1" id="fotp4" oninput="otpInput(this,4,'fotp')" onkeydown="otpBack(event,this,4,'fotp')" inputmode="numeric"/>
+          <input type="text" class="otp-input" maxlength="1" id="fotp5" oninput="otpInput(this,5,'fotp')" onkeydown="otpBack(event,this,5,'fotp')" inputmode="numeric"/>
+        </div>
+        <div class="form-group" style="margin-top:16px;">
+          <label class="form-label">Password Baru <span>*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="new-password" class="form-input" placeholder="Min. 8 karakter"/>
+            <button class="input-eye" onclick="togglePass('new-password',this)" type="button">👁️</button>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="btn-reset" onclick="doResetPassword()"><span>Reset Password</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = '';
+
+  // Particles
+  (function(){
+    const c = document.getElementById('particles');
+    for(let i=0;i<15;i++){
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const sz = Math.random()*6+2;
+      p.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;animation-duration:${Math.random()*15+10}s;animation-delay:${Math.random()*10}s;opacity:${Math.random()*0.5+0.1};`;
+      c.appendChild(p);
+    }
+  })();
+
+  function switchTab(tab) {
+    ['login','register'].forEach(t => {
+      document.getElementById('form-'+t).style.display = t===tab?'':'none';
+      document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+    });
+    document.getElementById('form-forgot').style.display = 'none';
+  }
+
+  function showForgot() {
+    document.getElementById('form-login').style.display = 'none';
+    document.getElementById('form-register').style.display = 'none';
+    document.getElementById('form-forgot').style.display = '';
+    document.getElementById('tab-login').classList.remove('active');
+    document.getElementById('tab-register').classList.remove('active');
+  }
+
+  function togglePass(id, btn) {
+    const inp = document.getElementById(id);
+    const show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    btn.textContent = show ? '🙈' : '👁️';
+  }
+
+  function checkStrength(v) {
+    const segs = [1,2,3,4].map(i => document.getElementById('str'+i));
+    segs.forEach(s => { s.className = 'strength-seg'; });
+    if(!v) return;
+    let sc = 0;
+    if(v.length>=8) sc++;
+    if(/[A-Z]/.test(v)) sc++;
+    if(/[0-9]/.test(v)) sc++;
+    if(/[^A-Za-z0-9]/.test(v)) sc++;
+    const cls = sc<=1?'active-weak':sc<=2?'active-medium':'active-strong';
+    for(let i=0;i<sc;i++) segs[i].classList.add(cls);
+  }
+
+  function showAlert(id, msg, type) {
+    const el = document.getElementById(id);
+    el.className = `alert alert-${type} show`;
+    el.innerHTML = `<span>${type==='error'?'❌':'✅'}</span> ${msg}`;
+  }
+  function hideAlert(id) { document.getElementById(id).classList.remove('show'); }
+  function showField(id, msg) { const e=document.getElementById(id); e.textContent=msg; e.classList.add('show'); }
+  function hideField(id) { document.getElementById(id).classList.remove('show'); }
+
+  function setLoading(id, loading, text) {
+    const b = document.getElementById(id);
+    b.disabled = loading;
+    b.innerHTML = loading ? '<div class="spinner"></div>' : `<span>${text}</span>`;
+  }
+
+  // OTP input helpers
+  function otpInput(el, idx, prefix) {
+    el.value = el.value.replace(/\D/g,'');
+    if(el.value) { el.classList.add('filled'); if(idx<5) document.getElementById(prefix+String(idx+1)).focus(); }
+    else el.classList.remove('filled');
+  }
+  function otpBack(ev, el, idx, prefix) {
+    if(ev.key==='Backspace' && !el.value && idx>0) document.getElementById(prefix+String(idx-1)).focus();
+  }
+  function getOtpVal(prefix) { return [0,1,2,3,4,5].map(i=>document.getElementById(prefix+i).value).join(''); }
+
+  // Timer
+  let timerIv, timeLeft=600;
+  function startTimer() {
+    timeLeft=600; document.getElementById('resend-btn').disabled=true;
+    clearInterval(timerIv);
+    timerIv = setInterval(()=>{
+      timeLeft--;
+      const m=Math.floor(timeLeft/60).toString().padStart(2,'0');
+      const s=(timeLeft%60).toString().padStart(2,'0');
+      document.getElementById('timer').textContent=`${m}:${s}`;
+      if(timeLeft<=0){ clearInterval(timerIv); document.getElementById('resend-btn').disabled=false; }
+    },1000);
+  }
+  function stopTimer() { clearInterval(timerIv); }
+
+  // LOGIN
+  async function doLogin() {
+    hideAlert('alert-login');
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    if(!email){ showField('err-login-email','Email harus diisi'); return; } hideField('err-login-email');
+    if(!password){ showField('err-login-pass','Password harus diisi'); return; } hideField('err-login-pass');
+    setLoading('btn-login',true,'Masuk');
+    try {
+      const res = await fetch(`${API}/api/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+      const data = await res.json();
+      if(data.success){
+        localStorage.setItem('cabaidetect_token',data.data.token);
+        localStorage.setItem('cabaidetect_user',JSON.stringify(data.data));
+        localStorage.setItem('token',data.data.token);
+        localStorage.setItem('user',JSON.stringify(data.data));
+        showAlert('alert-login','Login berhasil! Mengalihkan...','success');
+        setTimeout(()=>window.location.href='/home.html',1000);
+      } else { showAlert('alert-login',data.message,'error'); setLoading('btn-login',false,'Masuk'); }
+    } catch(e){ showAlert('alert-login','Koneksi gagal. Coba lagi.','error'); setLoading('btn-login',false,'Masuk'); }
+  }
+
+  // REGISTER
+  let regEmail='';
+  async function doRegister() {
+    hideAlert('alert-register');
+    ['err-nama','err-email','err-password','err-confirm'].forEach(hideField);
+    const nama=document.getElementById('reg-nama').value.trim();
+    const email=document.getElementById('reg-email').value.trim();
+    const password=document.getElementById('reg-password').value;
+    const confirm=document.getElementById('reg-confirm').value;
+    let ok=true;
+    if(!nama){showField('err-nama','Nama lengkap harus diisi');ok=false;}
+    if(!email||!/^[\w.-]+@[\w.-]+\.[a-z]{2,}$/.test(email)){showField('err-email','Format email tidak valid');ok=false;}
+    if(!password||password.length<8){showField('err-password','Password minimal 8 karakter');ok=false;}
+    if(password!==confirm){showField('err-confirm','Konfirmasi password tidak cocok');ok=false;}
+    if(!document.getElementById('agree-terms').checked){showAlert('alert-register','Kamu harus menyetujui syarat & ketentuan','error');ok=false;}
+    if(!ok) return;
+    setLoading('btn-register',true,'Daftar & Kirim OTP');
+    try {
+      const res=await fetch(`${API}/api/auth/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({namaLengkap:nama,email,password,confirmPassword:confirm})});
+      const data=await res.json();
+      if(data.success){
+        regEmail=email;
+        document.getElementById('otp-email-display').textContent=email;
+        document.getElementById('reg-step1').style.display='none';
+        document.getElementById('reg-step2').style.display='';
+        ['step1'].forEach(s=>{document.getElementById(s).classList.remove('active');document.getElementById(s).classList.add('done');document.getElementById(s).textContent='✓';});
+        document.getElementById('line1').classList.add('done');
+        document.getElementById('step2').classList.add('active');
+        document.getElementById('otp0').focus();
+        startTimer();
+      } else { showAlert('alert-register',data.message,'error'); }
+    } catch(e){ showAlert('alert-register','Koneksi gagal. Coba lagi.','error'); }
+    setLoading('btn-register',false,'Daftar & Kirim OTP');
+  }
+
+  function goBackReg(){
+    document.getElementById('reg-step1').style.display='';
+    document.getElementById('reg-step2').style.display='none';
+    document.getElementById('step1').classList.add('active'); document.getElementById('step1').classList.remove('done'); document.getElementById('step1').textContent='1';
+    document.getElementById('line1').classList.remove('done');
+    document.getElementById('step2').classList.remove('active');
+    stopTimer();
+  }
+
+  // VERIFY OTP
+  async function doVerifyOtp(){
+    hideAlert('alert-otp');
+    const otp=getOtpVal('otp');
+    if(otp.length!==6){showAlert('alert-otp','Masukkan 6 digit OTP','error');return;}
+    setLoading('btn-verify',true,'Verifikasi OTP');
+    try{
+      const res=await fetch(`${API}/api/auth/verify-otp`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:regEmail,otp})});
+      const data=await res.json();
+      if(data.success){
+        localStorage.setItem('cabaidetect_token',data.data.token);
+        localStorage.setItem('cabaidetect_user',JSON.stringify(data.data));
+        localStorage.setItem('token',data.data.token);
+        localStorage.setItem('user',JSON.stringify(data.data));
+        stopTimer();
+        document.getElementById('reg-step2').style.display='none';
+        document.getElementById('reg-step3').style.display='';
+        document.getElementById('step2').classList.remove('active'); document.getElementById('step2').classList.add('done'); document.getElementById('step2').textContent='✓';
+        document.getElementById('line2').classList.add('done'); document.getElementById('step3').classList.add('done');
+        setTimeout(()=>window.location.href='/home.html',2000);
+      } else { showAlert('alert-otp',data.message,'error'); setLoading('btn-verify',false,'Verifikasi OTP'); }
+    }catch(e){ showAlert('alert-otp','Koneksi gagal.','error'); setLoading('btn-verify',false,'Verifikasi OTP'); }
+  }
+
+  // RESEND OTP
+  async function doResend(){
+    try{
+      const res=await fetch(`${API}/api/auth/resend-otp`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:regEmail})});
+      const data=await res.json();
+      showAlert('alert-otp',data.message,data.success?'success':'error');
+      if(data.success){ startTimer(); [0,1,2,3,4,5].forEach(i=>{const e=document.getElementById('otp'+i);e.value='';e.classList.remove('filled');}); }
+    }catch(e){ showAlert('alert-otp','Koneksi gagal.','error'); }
+  }
+
+  // FORGOT PASSWORD
+  async function doForgot(){
+    const email=document.getElementById('forgot-email').value.trim();
+    if(!email) return;
+    setLoading('btn-forgot',true,'Kirim Kode OTP');
+    try{
+      const res=await fetch(`${API}/api/auth/forgot-password`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+      const data=await res.json();
+      showAlert('alert-forgot',data.message,'success');
+      document.getElementById('forgot-step1').style.display='none';
+      document.getElementById('forgot-step2').style.display='';
+      document.getElementById('fotp0').focus();
+    }catch(e){ showAlert('alert-forgot','Koneksi gagal.','error'); }
+    setLoading('btn-forgot',false,'Kirim Kode OTP');
+  }
+
+  async function doResetPassword(){
+    hideAlert('alert-forgot');
+    const email=document.getElementById('forgot-email').value.trim();
+    const otp=getOtpVal('fotp');
+    const newPassword=document.getElementById('new-password').value;
+    if(otp.length!==6){showAlert('alert-forgot','Masukkan 6 digit OTP','error');return;}
+    if(!newPassword||newPassword.length<8){showAlert('alert-forgot','Password minimal 8 karakter','error');return;}
+    setLoading('btn-reset',true,'Reset Password');
+    try{
+      const res=await fetch(`${API}/api/auth/reset-password`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,otp,newPassword})});
+      const data=await res.json();
+      showAlert('alert-forgot',data.message,data.success?'success':'error');
+      if(data.success) setTimeout(()=>switchTab('login'),2000);
+    }catch(e){ showAlert('alert-forgot','Koneksi gagal.','error'); }
+    setLoading('btn-reset',false,'Reset Password');
+  }
+
+  // Enter key
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='Enter') return;
+    const lv = document.getElementById('form-login').style.display!=='none';
+    const rv = document.getElementById('form-register').style.display!=='none';
+    if(lv) doLogin();
+    else if(rv){
+      const s1=document.getElementById('reg-step1').style.display!=='none';
+      if(s1) doRegister(); else doVerifyOtp();
+    }
+  });
+
+  // Check tab from URL (e.g. login.html?tab=register or login.html#register)
+  const urlParams = new URLSearchParams(window.location.search);
+  if(urlParams.get('tab') === 'register' || window.location.hash === '#register') {
+    switchTab('register');
+  } else if(urlParams.get('tab') === 'forgot' || window.location.hash === '#forgot') {
+    showForgot();
+  }
+
+  // Redirect if already logged in
+  if(localStorage.getItem('cabaidetect_token') || localStorage.getItem('token')) {
+    window.location.href = '/home.html';
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Beranda - CabaiDetect</title>
+  <meta name="description" content="Beranda aplikasi CabaiDetect">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Hero Section -->
+    <div class="home-hero fade-in">
+      <p class="home-greeting">Selamat Datang 👋</p>
+      <h1 class="home-user" id="home-username">-</h1>
+
+      <div class="home-banner">
+        <h2>Deteksi Penyakit Buah Cabai</h2>
+        <p>Analisis penyakit buah cabai (Antraknosa/Patek, Busuk Buah, Lalat Buah) dengan AI & parameter lingkungan. Mendukung 3 varietas: <strong>Cabai Rawit</strong>, <strong>Cabai Merah Keriting</strong>, dan <strong>Cabai Merah Besar</strong>.</p>
+        <a href="/detect.html" class="btn">🔍 Mulai Deteksi Buah</a>
+      </div>
+    </div>
+
+    <!-- Menu -->
+    <div class="home-menu fade-in fade-in-delay-1">
+      <h3>Menu Utama</h3>
+      <div class="menu-grid">
+        <a href="/detect.html" class="menu-card">
+          <div class="icon green">🌶️</div>
+          <h4>Deteksi Buah Cabai</h4>
+          <p>Analisis foto buah & data agroklimat</p>
+        </a>
+        <a href="/history.html" class="menu-card">
+          <div class="icon blue">📋</div>
+          <h4>Riwayat</h4>
+          <p>Lihat hasil deteksi sebelumnya</p>
+        </a>
+        <a href="/profile.html" class="menu-card">
+          <div class="icon orange">⚙️</div>
+          <h4>Pengaturan</h4>
+          <p>Kelola profil akun Anda</p>
+        </a>
+        <a href="#" class="menu-card" onclick="showToast('Segera hadir!', 'error')">
+          <div class="icon purple">📊</div>
+          <h4>Statistik</h4>
+          <p>Laporan & analisis data</p>
+        </a>
+      </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <a href="/home.html" class="nav-item active" data-page="home">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Beranda</span>
+      </a>
+      <a href="/detect.html" class="nav-item" data-page="detect">
+        <span class="nav-icon">🔍</span>
+        <span class="nav-label">Deteksi</span>
+      </a>
+      <a href="/history.html" class="nav-item" data-page="history">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Riwayat</span>
+      </a>
+      <a href="/profile.html" class="nav-item" data-page="profile">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profil</span>
+      </a>
+    </nav>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    if (!requireAuth()) {}
+    else {
+      const user = getUser();
+      document.getElementById('home-username').textContent = user.namaLengkap || 'Pengguna';
+      setActiveNav('home');
+    }
+  </script>
+</body>
+</html>

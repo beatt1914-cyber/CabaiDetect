@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Profil - CabaiDetect</title>
+  <meta name="description" content="Profil pengguna">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Top Bar -->
+    <div class="topbar">
+      <a href="/home.html" class="topbar-back">←</a>
+      <span class="topbar-title">Profil Saya</span>
+      <div class="topbar-action" onclick="handleLogout()" style="cursor:pointer; color:var(--accent-light); font-size:14px; font-weight:600;">Keluar</div>
+    </div>
+
+    <div class="profile-page fade-in">
+      <div class="profile-avatar" id="profile-avatar-letter">U</div>
+      <h2 style="text-align:center; font-size:20px; font-weight:700; margin-bottom:4px" id="profile-name">-</h2>
+      <p style="text-align:center; color:var(--text-secondary); font-size:14px; margin-bottom:32px" id="profile-username">-</p>
+
+      <form onsubmit="handleUpdateProfile(event)" class="result-card">
+        <h3 style="font-size:16px; margin-bottom:16px; font-weight:600">Update Profil</h3>
+        <div class="form-group">
+          <label>Nama Lengkap</label>
+          <input type="text" class="form-control" id="edit-nama" required>
+        </div>
+        <div class="form-group">
+          <label>Password Baru (Opsional)</label>
+          <input type="password" class="form-control" id="edit-password" placeholder="Biarkan kosong jika tidak ingin mengubah" minlength="6">
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top:8px">💾 Simpan Perubahan</button>
+      </form>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <a href="/home.html" class="nav-item" data-page="home">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Beranda</span>
+      </a>
+      <a href="/detect.html" class="nav-item" data-page="detect">
+        <span class="nav-icon">🔍</span>
+        <span class="nav-label">Deteksi</span>
+      </a>
+      <a href="/history.html" class="nav-item" data-page="history">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Riwayat</span>
+      </a>
+      <a href="/profile.html" class="nav-item active" data-page="profile">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profil</span>
+      </a>
+    </nav>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>initProfilePage();</script>
+</body>
+</html>

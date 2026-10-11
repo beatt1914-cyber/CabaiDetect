@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Hasil Prediksi - CabaiDetect</title>
+  <meta name="description" content="Hasil deteksi penyakit dan saran penanganan">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Top Bar -->
+    <div class="topbar">
+      <a href="/home.html" class="topbar-back">←</a>
+      <span class="topbar-title">Hasil Prediksi</span>
+      <div class="topbar-action"></div>
+    </div>
+
+    <div class="result-page">
+      <!-- Hasil Utama -->
+      <div class="result-card fade-in">
+        <div class="result-disease">
+          <span class="badge badge-danger" id="result-badge">⚠ Penyakit Terdeteksi</span>
+          <h2 id="result-disease">-</h2>
+          <div id="result-plant-info" style="font-size:13px; color:var(--text-secondary); margin-bottom:6px; font-weight:500;">-</div>
+          <div class="confidence-text" id="result-confidence">-</div>
+          <div class="confidence-bar">
+            <div class="confidence-fill" id="confidence-bar" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Detail Lingkungan -->
+        <div class="section-title" style="margin-top:16px">📊 Faktor Pendukung</div>
+        <div class="result-details" id="result-details"></div>
+      </div>
+
+      <!-- Saran Penanganan -->
+      <div class="saran-card fade-in fade-in-delay-1">
+        <h3>💡 Saran Penanganan</h3>
+        <ul id="result-saran">
+          <li>Memuat saran...</li>
+        </ul>
+      </div>
+
+      <!-- Actions -->
+      <div class="fade-in fade-in-delay-2" style="display:flex; gap:12px; margin-top:8px">
+        <a href="/detect.html" class="btn btn-primary" style="flex:1">🔄 Deteksi Lagi</a>
+        <a href="/history.html" class="btn btn-outline" style="flex:1">📋 Riwayat</a>
+      </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <a href="/home.html" class="nav-item" data-page="home">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Beranda</span>
+      </a>
+      <a href="/detect.html" class="nav-item" data-page="detect">
+        <span class="nav-icon">🔍</span>
+        <span class="nav-label">Deteksi</span>
+      </a>
+      <a href="/history.html" class="nav-item" data-page="history">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Riwayat</span>
+      </a>
+      <a href="/profile.html" class="nav-item" data-page="profile">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profil</span>
+      </a>
+    </nav>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>initResultPage();</script>
+</body>
+</html>
