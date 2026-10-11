@@ -268,7 +268,7 @@
           <div class="field-error" id="err-confirm"></div>
         </div>
         <div class="checkbox-group">
-          <input type="checkbox" id="agree-terms"/>
+          <input type="checkbox" id="agree-terms" checked/>
           <label for="agree-terms">Saya setuju dengan <a href="#" class="link">syarat &amp; ketentuan</a></label>
         </div>
         <button class="btn btn-primary" id="btn-register" onclick="doRegister()"><span>Daftar &amp; Kirim OTP</span></button>
@@ -404,12 +404,22 @@
 
   function showAlert(id, msg, type) {
     const el = document.getElementById(id);
-    el.className = `alert alert-${type} show`;
-    el.innerHTML = `<span>${type==='error'?'❌':'✅'}</span> ${msg}`;
+    if(el) {
+      el.className = `alert alert-${type} show`;
+      el.innerHTML = `<span>${type==='error'?'❌':'✅'}</span> ${msg}`;
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   }
-  function hideAlert(id) { document.getElementById(id).classList.remove('show'); }
-  function showField(id, msg) { const e=document.getElementById(id); e.textContent=msg; e.classList.add('show'); }
-  function hideField(id) { document.getElementById(id).classList.remove('show'); }
+  function hideAlert(id) { const e = document.getElementById(id); if(e) e.classList.remove('show'); }
+  function showField(id, msg) {
+    const e = document.getElementById(id);
+    if(e) {
+      e.textContent = msg;
+      e.classList.add('show');
+      e.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+  function hideField(id) { const e = document.getElementById(id); if(e) e.classList.remove('show'); }
 
   function setLoading(id, loading, text) {
     const b = document.getElementById(id);
@@ -493,6 +503,7 @@
         ['step1'].forEach(s=>{document.getElementById(s).classList.remove('active');document.getElementById(s).classList.add('done');document.getElementById(s).textContent='✓';});
         document.getElementById('line1').classList.add('done');
         document.getElementById('step2').classList.add('active');
+        showAlert('alert-otp', data.message, 'success');
         document.getElementById('otp0').focus();
         startTimer();
       } else { showAlert('alert-register',data.message,'error'); }

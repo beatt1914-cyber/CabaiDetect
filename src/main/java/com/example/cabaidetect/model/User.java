@@ -38,6 +38,20 @@ public class User {
     @Column
     private LocalDateTime lastLoginAt;
 
+    @Column(name = "email_or_username")
+    private String emailOrUsername;
+
+    @PrePersist
+    @PreUpdate
+    public void prePersist() {
+        if (this.emailOrUsername == null) {
+            this.emailOrUsername = this.email;
+        }
+        if (this.email == null) {
+            this.email = this.emailOrUsername;
+        }
+    }
+
     // ─── Getters & Setters ───────────────────────────────────────────────────
 
     public Long getId() { return id; }
@@ -47,7 +61,10 @@ public class User {
     public void setNamaLengkap(String namaLengkap) { this.namaLengkap = namaLengkap; }
 
     public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public void setEmail(String email) { 
+        this.email = email; 
+        this.emailOrUsername = email;
+    }
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
@@ -70,7 +87,11 @@ public class User {
     public LocalDateTime getLastLoginAt() { return lastLoginAt; }
     public void setLastLoginAt(LocalDateTime lastLoginAt) { this.lastLoginAt = lastLoginAt; }
 
-    // Backward compatibility with legacy frontend and controllers
-    public String getEmailOrUsername() { return email; }
-    public void setEmailOrUsername(String emailOrUsername) { this.email = emailOrUsername; }
+    public String getEmailOrUsername() { 
+        return emailOrUsername != null ? emailOrUsername : email; 
+    }
+    public void setEmailOrUsername(String emailOrUsername) { 
+        this.emailOrUsername = emailOrUsername; 
+        if (this.email == null) this.email = emailOrUsername;
+    }
 }

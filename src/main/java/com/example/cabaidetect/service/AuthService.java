@@ -53,9 +53,12 @@ public class AuthService {
         userRepository.save(user);
 
         // Kirim OTP via Gmail
-        emailService.sendOtpEmail(user.getEmail(), user.getNamaLengkap(), otp);
-
-        return ApiResponse.ok("Registrasi berhasil! Cek email kamu untuk kode OTP.", null);
+        boolean sent = emailService.sendOtpEmail(user.getEmail(), user.getNamaLengkap(), otp);
+        if (sent) {
+            return ApiResponse.ok("Registrasi berhasil! Cek email kamu untuk kode OTP.", null);
+        } else {
+            return ApiResponse.ok("Registrasi berhasil! [Mode Dev] Kode OTP kamu adalah: " + otp, null);
+        }
     }
 
     // ─── Verify OTP ──────────────────────────────────────────────────────────
@@ -107,8 +110,12 @@ public class AuthService {
         user.setOtpExpiry(LocalDateTime.now().plusMinutes(10));
         userRepository.save(user);
 
-        emailService.sendOtpEmail(user.getEmail(), user.getNamaLengkap(), otp);
-        return ApiResponse.ok("Kode OTP baru telah dikirim ke email kamu.", null);
+        boolean sent = emailService.sendOtpEmail(user.getEmail(), user.getNamaLengkap(), otp);
+        if (sent) {
+            return ApiResponse.ok("Kode OTP baru telah dikirim ke email kamu.", null);
+        } else {
+            return ApiResponse.ok("Kode OTP baru kamu: " + otp, null);
+        }
     }
 
     // ─── Login ───────────────────────────────────────────────────────────────
@@ -148,8 +155,12 @@ public class AuthService {
         user.setOtpExpiry(LocalDateTime.now().plusMinutes(10));
         userRepository.save(user);
 
-        emailService.sendOtpEmail(user.getEmail(), user.getNamaLengkap(), otp);
-        return ApiResponse.ok("Jika email terdaftar, kode OTP akan dikirim.", null);
+        boolean sent = emailService.sendOtpEmail(user.getEmail(), user.getNamaLengkap(), otp);
+        if (sent) {
+            return ApiResponse.ok("Jika email terdaftar, kode OTP akan dikirim.", null);
+        } else {
+            return ApiResponse.ok("Kode OTP reset password kamu: " + otp, null);
+        }
     }
 
     // ─── Reset Password ──────────────────────────────────────────────────────

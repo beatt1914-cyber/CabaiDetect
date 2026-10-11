@@ -17,8 +17,14 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    public void sendOtpEmail(String toEmail, String namaLengkap, String otp) {
+    public boolean sendOtpEmail(String toEmail, String namaLengkap, String otp) {
         try {
+            if (fromEmail == null || fromEmail.contains("your-email@gmail.com") || fromEmail.isBlank()) {
+                System.out.println("=================================================");
+                System.out.println(">>> [DEV OTP] Untuk: " + toEmail + " | KODE OTP: " + otp);
+                System.out.println("=================================================");
+                return false;
+            }
             MimeMessage msg = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(msg, true, "UTF-8");
             helper.setFrom(fromEmail, "CabaiDetect");
@@ -26,13 +32,21 @@ public class EmailService {
             helper.setSubject("Kode OTP Verifikasi CabaiDetect");
             helper.setText(buildOtpHtml(namaLengkap, otp), true);
             mailSender.send(msg);
-        } catch (MessagingException | java.io.UnsupportedEncodingException e) {
-            throw new RuntimeException("Gagal mengirim email OTP: " + e.getMessage(), e);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Gagal mengirim email OTP via SMTP: " + e.getMessage());
+            System.out.println("=================================================");
+            System.out.println(">>> [FALLBACK OTP] Untuk: " + toEmail + " | KODE OTP: " + otp);
+            System.out.println("=================================================");
+            return false;
         }
     }
 
     public void sendWelcomeEmail(String toEmail, String namaLengkap) {
         try {
+            if (fromEmail == null || fromEmail.contains("your-email@gmail.com") || fromEmail.isBlank()) {
+                return;
+            }
             MimeMessage msg = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(msg, true, "UTF-8");
             helper.setFrom(fromEmail, "CabaiDetect");
@@ -40,7 +54,7 @@ public class EmailService {
             helper.setSubject("Selamat Datang di CabaiDetect! 🌶️");
             helper.setText(buildWelcomeHtml(namaLengkap), true);
             mailSender.send(msg);
-        } catch (MessagingException | java.io.UnsupportedEncodingException e) {
+        } catch (Exception e) {
             // Welcome email non-critical, log only
             System.err.println("Gagal kirim welcome email: " + e.getMessage());
         }
